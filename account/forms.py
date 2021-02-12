@@ -6,6 +6,13 @@ from .models import Profile, Book
 from bootstrap_modal_forms.forms import BSModalModelForm
 
 
+class BookForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        fields = (
+        'title', 'publication_date', 'author', 'price', 'pages', 'book_type',)
+
+
 class BookModelForm(BSModalModelForm):
     class Meta:
         model = Book
