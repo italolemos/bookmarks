@@ -6,7 +6,8 @@ urlpatterns = [
     # post views
     path('home/', views.create_book, name='index'),
     path('create_book/', views.BookCreateView.as_view(), name='create_book'),
-    path('books/', views.books, name='books'),
+    path('books/', views.book_list, name='book_list'),
+    path('books/create/', views.book_create, name='book_create'),
     path('update/<int:pk>', views.BookUpdateView.as_view(), name='update_book'),
     path('register/', views.register, name='register'),
     path('edit/', views.edit, name='edit'),
