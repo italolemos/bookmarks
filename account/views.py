@@ -47,7 +47,7 @@ def book_list(request):
     return render(request, 'account/book_list.html', {'books': books})
 
 
-def book_create(request):
+def save_book_form(request, form, template_name):
     data = dict()
 
     if request.method == 'POST':
@@ -64,16 +64,34 @@ def book_create(request):
                 })
         else:
             data['form_is_valid'] = False
+
+    context = {'form': form}
+    data['html_form'] = render_to_string(template_name,
+                                         context, request=request)
+    return JsonResponse(data)
+
+
+def book_create(request):
+    if request.method == 'POST':
+        form = BookForm(request.POST)
     else:
         form = BookForm()
 
-    context = {'form': form}
-    data['html_form'] = render_to_string(
-        'account/includes/partial_book_create.html',
-        context,
-        request=request,
-    )
-    return JsonResponse(data)
+    return save_book_form(request, form,
+                          'account/includes/partial_book_create.html')
+
+
+def book_update(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+
+    if request.method == 'POST':
+        form = BookForm(request.POST, instance=book)
+    else:
+        form = BookForm(instance=book)
+
+    return save_book_form(request, form,
+                          'account/includes/partial_book_update.html')
+
 
 
 def books(request):
