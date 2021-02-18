@@ -1,23 +1,24 @@
 # Create your views here.
+from bootstrap_modal_forms.generic import BSModalCreateView, BSModalUpdateView
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
-from bootstrap_modal_forms.generic import BSModalCreateView, BSModalUpdateView
-from django.urls import reverse_lazy
-from django.template.loader import render_to_string
+from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.shortcuts import render
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.views.decorators.http import require_POST
 
+from actions.utils import create_action
+from common.decorators import ajax_required
+from .forms import BookForm
 from .forms import LoginForm, UserRegistrationForm, UserEditForm, \
     ProfileEditForm, BookModelForm
-from .models import Profile, Book
-from django.contrib.auth.models import User
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from common.decorators import ajax_required
 from .models import Contact
-from .forms import BookForm
+from .models import Profile, Book
 
 
 def create_book(request):
@@ -134,6 +135,7 @@ def user_follow(request):
                     user_from=request.user,
                     user_to=user
                 )
+                create_action(request.user, 'is following', user)
             else:
                 Contact.objects.filter(user_from=request.user,
                                        user_to=user).delete()
@@ -199,6 +201,7 @@ def register(request):
             new_user.save()
             # Create the user profile
             Profile.objects.create(user=new_user)
+            create_action(new_user, 'has created an account')
             return render(request,
                           'account/register_done.html',
                           {'new_user': new_user})
