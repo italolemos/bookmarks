@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'easy_thumbnails',
     'bootstrap_modal_forms',
     'actions.apps.ActionsConfig',
+
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [

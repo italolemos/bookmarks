@@ -17,6 +17,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from common.decorators import ajax_required
 from .models import Contact
+from .forms import BookForm
 
 
 def create_book(request):
@@ -38,6 +39,59 @@ def create_book(request):
         return JsonResponse(response_data)
 
     return render(request, 'account/index.html', {'books': books})
+
+
+def book_list(request):
+    books = Book.objects.all()
+
+    return render(request, 'account/book_list.html', {'books': books})
+
+
+def save_book_form(request, form, template_name):
+    data = dict()
+
+    if request.method == 'POST':
+        form = BookForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            data['form_is_valid'] = True
+
+            books = Book.objects.all()
+            data['html_book_list'] = render_to_string(
+                'account/includes/partial_book_list.html', {
+                    'books': books
+                })
+        else:
+            data['form_is_valid'] = False
+
+    context = {'form': form}
+    data['html_form'] = render_to_string(template_name,
+                                         context, request=request)
+    return JsonResponse(data)
+
+
+def book_create(request):
+    if request.method == 'POST':
+        form = BookForm(request.POST)
+    else:
+        form = BookForm()
+
+    return save_book_form(request, form,
+                          'account/includes/partial_book_create.html')
+
+
+def book_update(request, pk):
+    book = get_object_or_404(Book, pk=pk)
+
+    if request.method == 'POST':
+        form = BookForm(request.POST, instance=book)
+    else:
+        form = BookForm(instance=book)
+
+    return save_book_form(request, form,
+                          'account/includes/partial_book_update.html')
+
 
 
 def books(request):

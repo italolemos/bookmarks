@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1 class="page-header">Books</h1>
+
+    <!-- BUTTON TO TRIGGER THE ACTION -->
+    <p>
+        <button type="button"
+                class="btn btn-primary js-create-book"
+                data-url="{% url 'book_create' %}">
+            <span class="glyphicon glyphicon-plus"></span>
+            New book
+        </button>
+    </p>
+
+    <table class="table" id="book-table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Type</th>
+            <th>Publication date</th>
+            <th>Pages</th>
+            <th>Price</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% include 'account/includes/partial_book_list.html' %}
+        </tbody>
+    </table>
+
+
+    <!-- THE MODAL WE WILL BE USING -->
+    <div class="modal fade" id="modal-book">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extrascripts %}
+    <script type="text/javascript">
+        $(function () {
+
+
+            {#$("#modal-book").on("submit", ".js-book-create-form", function () {#}
+            {#    var form = $(this)#}
+            {#    $.ajax({#}
+            {#        url: form.attr('action'),#}
+            {#        data: form.serialize(),#}
+            {#        type: form.attr('method'),#}
+            {#        dataType: 'json',#}
+            {#        success: function (data) {#}
+            {#            console.log(data.form_is_valid)#}
+            {#            if (data.form_is_valid) {#}
+            {#                $("#book-table tbody").html(data.html_book_list); // <-- Replace the table body#}
+            {#                $("#modal-book").modal("hide"); // <-- Close the modal#}
+            {#            } else {#}
+            {#                $('#modal-book .modal-content').html(data.html_form);#}
+            {#            }#}
+            {#        }#}
+            {#    })#}
+            {#    return false;#}
+            {#});#}
+
+            /* Functions */
+            var loadForm = function () {
+                var btn = $(this);
+                $.ajax({
+                    url: btn.attr("data-url"),
+                    type: 'get',
+                    dataType: 'json',
+                    beforeSend: function () {
+                        $("#modal-book").modal("show");
+                    },
+                    success: function (data) {
+                        $("#modal-book .modal-content").html(data.html_form)
+                    }
+                })
+            };
+
+            var saveForm = function () {
+                var form = $(this);
+                $.ajax({
+                    url: form.attr("action"),
+                    data: form.serialize(),
+                    type: form.attr("method"),
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.form_is_valid) {
+                            $("#book-table tbody").html(data.html_book_list);
+                            $("#modal-book").modal("hide");
+                        }
+                        else {
+                            $("#modal-book .modal-content").html(data.html_form);
+                        }
+                    }
+                })
+                return false;
+            }
+
+            /* Binding */
+
+            //Create book
+            $(".js-create-book").click(loadForm);
+            $("#modal-book").on("submit", ".js-book-create-form", saveForm);
+
+            // Update book
+            $("#book-table").on("click", ".js-update-book", loadForm);
+            $("#modal-book").on("submit", ".js-book-update-form", saveForm);
+
+
+        }) // close tag function
+    </script>
+{% endblock extrascripts %}
