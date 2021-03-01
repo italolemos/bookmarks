@@ -19,6 +19,7 @@ from .forms import LoginForm, UserRegistrationForm, UserEditForm, \
     ProfileEditForm, BookModelForm
 from .models import Contact
 from .models import Profile, Book
+from actions.models import Action
 
 
 def create_book(request):
@@ -92,7 +93,6 @@ def book_update(request, pk):
 
     return save_book_form(request, form,
                           'account/includes/partial_book_update.html')
-
 
 
 def books(request):
@@ -214,9 +214,20 @@ def register(request):
 
 @login_required
 def dashboard(request):
+    # Display all actions by default
+    actions = Action.objects.exclude(user=request.user)
+    following_ids = request.user.following.value_list('id', flat=True)
+
+    if following_ids:
+        # If user is following other, retrieve only their actions
+        actions = actions.filter(user_id__in=following_ids)
+    actions = actions.select_related(
+        'user', 'user__profile').prefetch_related('target')[:10]
+
     return render(request,
                   'account/dashboard.html',
-                  {'section': 'dashboard'})
+                  {'section': 'dashboard',
+                   'actions': actions})
 
 
 def user_login(request):
