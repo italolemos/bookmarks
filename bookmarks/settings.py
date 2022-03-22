@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 from pathlib import Path
+
 from django.urls import reverse_lazy
 
 ABSOLUTE_URL_OVERRIDES = {
@@ -49,11 +50,12 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'django.contrib.admin',
     'images.apps.ImagesConfig',
+    'actions.apps.ActionsConfig',
+    'blog.apps.BlogConfig',
+    # Third libs
     'django_extensions',
     'easy_thumbnails',
     'bootstrap_modal_forms',
-    'actions.apps.ActionsConfig',
-
     'widget_tweaks',
 ]
 

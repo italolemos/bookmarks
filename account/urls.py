@@ -1,8 +1,11 @@
-from django.urls import path
-from . import views
 from django.contrib.auth import views as auth_views
+from django.urls import path
+
+from . import views
 
 urlpatterns = [
+    path('turma/', views.CreateTurma.as_view(), name='turma-create'),
+    path('form/', views.create_book_normal),
     # post views
     path('home/', views.create_book, name='index'),
     path('create_book/', views.BookCreateView.as_view(), name='create_book'),

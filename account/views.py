@@ -7,19 +7,49 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST
+from django.views.generic import CreateView
 
+from actions.models import Action
 from actions.utils import create_action
 from common.decorators import ajax_required
-from .forms import BookForm
+from .forms import BookForm, BookFormset
 from .forms import LoginForm, UserRegistrationForm, UserEditForm, \
-    ProfileEditForm, BookModelForm
+    ProfileEditForm, BookModelForm, TurmaForm
 from .models import Contact
 from .models import Profile, Book
-from actions.models import Action
+
+
+class CreateTurma(CreateView):
+    form_class = TurmaForm
+    template_name = 'account/create_turma.html'
+
+
+def create_book_normal(request):
+    template_name = 'account/create_normal.html'
+    heading_message = 'Formset Demo'
+
+    if request.method == 'GET':
+        formset = BookFormset(request.GET or None)
+    elif request.method == 'POST':
+        formset = BookFormset(request.POST)
+        print(formset.errors)
+        if formset.is_valid():
+            for form in formset:
+                # extract name from each form and save
+                name = form.cleaned_data.get('name')
+                # save book instance
+                if name:
+                    Book(name=name).save()
+            # once all books are saved, redirect to book list view
+            return redirect('book_list')
+    return render(request, template_name, {
+        'formset': formset,
+        'heading': heading_message,
+    })
 
 
 def create_book(request):

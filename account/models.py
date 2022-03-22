@@ -1,9 +1,11 @@
-from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db import models
 
 
-# Create your models here.
+class Turma(models.Model):
+    professores = models.ManyToManyField(settings.AUTH_USER_MODEL)
+
 
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL,

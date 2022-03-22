@@ -1,10 +1,21 @@
+from bootstrap_modal_forms.forms import BSModalModelForm
 from django import forms
 from django.contrib.auth.models import User
+from django.forms import formset_factory
 
-from .models import Profile, Book
+from .models import Profile, Book, Turma
 
-from bootstrap_modal_forms.forms import BSModalModelForm
 
+class TurmaForm(forms.ModelForm):
+    turma = forms.ModelMultipleChoiceField(queryset=User.objects.all(),
+                                           widget=forms.SelectMultiple(
+                                               attrs={
+                                                   'class': 'multiselect-dropdown form-control'}
+                                           ))
+
+    class Meta:
+        model = Turma
+        fields = ['turma']
 
 class BookForm(forms.ModelForm):
     class Meta:
@@ -12,6 +23,8 @@ class BookForm(forms.ModelForm):
         fields = (
         'title', 'publication_date', 'author', 'price', 'pages', 'book_type',)
 
+
+BookFormset = formset_factory(BookForm, extra=1)
 
 class BookModelForm(BSModalModelForm):
     class Meta:
