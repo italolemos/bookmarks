@@ -1,10 +1,27 @@
 version: '3.9'
 
 services:
+  db:
+    image: postgres:14.2-alpine3.15
+    container_name: bookmarks_postgres
+    environment:
+      - POSTGRES_DB=mydb_dev
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
+    env_file:
+      - config/.env
     volumes:
       - .:/app/
+    environment:
+      - POSTGRES_DB=mydb_dev
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
     ports:
       - 8000:8000
